@@ -24,9 +24,10 @@ def get_attractions(city: str) -> str:
     geo_data = geo_response.json()
 
     return str(geo_data)
-
     lat = geo_data["lat"]
     lon = geo_data["lon"]
+
+    print("PASSED LAT/LON STEP")
 
     places_url = (
         f"https://api.opentripmap.com/0.1/en/places/radius"
@@ -37,15 +38,12 @@ def get_attractions(city: str) -> str:
         f"&limit=5"
         f"&apikey={api_key}"
     )
+    print("PLACES URL:", places_url)
 
     places_response = requests.get(places_url)
 
-    print("PLACES STATUS:", places_response.status_code)
-
-    places_data = places_response.json()
-
-    print("PLACES DATA:")
-    print(places_data)
+    print("PLACES REQUEST SENT")
+    print("STATUS:", places_response.status_code)
 
     attractions = []
 
