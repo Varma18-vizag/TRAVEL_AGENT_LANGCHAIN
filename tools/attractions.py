@@ -39,7 +39,13 @@ def get_attractions(city: str) -> str:
     )
 
     places_response = requests.get(places_url)
+
+    print("PLACES STATUS:", places_response.status_code)
+
     places_data = places_response.json()
+
+    print("PLACES DATA:")
+    print(places_data)
 
     attractions = []
 
