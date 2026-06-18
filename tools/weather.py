@@ -1,41 +1,38 @@
 from langchain.tools import tool
 import requests
-import os
-from dotenv import load_dotenv
 
-load_dotenv()
 
 @tool
 def get_weather(city: str) -> str:
-    """Fetch the current weather data of a city"""
+    """
+    Fetch weather data for a city.
+    """
 
-    api_key = os.getenv("WEATHERSTACK_API_KEY")
-
-    url = (
-        f"http://api.weatherstack.com/current"
-        f"?access_key={api_key}"
-        f"&query={city}"
+    geo_url = (
+        f"https://geocoding-api.open-meteo.com/v1/search"
+        f"?name={city}&count=1"
     )
 
-    response = requests.get(url)
+    geo_data = requests.get(geo_url).json()
 
-    try:
+    if "results" not in geo_data:
+        return f"City not found: {city}"
 
-        data = response.json()
+    lat = geo_data["results"][0]["latitude"]
+    lon = geo_data["results"][0]["longitude"]
 
-        if "current" not in data:
-            return (
-                f"Weather data unavailable "
-                f"for {city}"
-            )
+    weather_url = (
+        f"https://api.open-meteo.com/v1/forecast"
+        f"?latitude={lat}"
+        f"&longitude={lon}"
+        f"&current_weather=true"
+    )
 
-        current = data["current"]
+    weather_data = requests.get(weather_url).json()
 
-        return (
-            f"Temperature: {current['temperature']}°C\n"
-            f"Weather: {current['weather_descriptions'][0]}"
-        )
+    current = weather_data["current_weather"]
 
-    except Exception as e:
-
-        return f"Weather Tool Error: {str(e)}"
+    return (
+        f"Temperature: {current['temperature']}°C\n"
+        f"Wind Speed: {current['windspeed']} km/h"
+    )
