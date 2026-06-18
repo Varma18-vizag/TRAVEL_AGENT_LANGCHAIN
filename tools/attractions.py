@@ -14,43 +14,79 @@ def get_attractions(city: str) -> str:
 
     api_key = os.getenv("OPENTRIPMAP_API_KEY")
 
-    geo_url = (
-        f"https://api.opentripmap.com/0.1/en/places/geoname"
-        f"?name={city}"
-        f"&apikey={api_key}"
-    )
+    try:
 
-    geo_response = requests.get(geo_url)
-    geo_data = geo_response.json()
+        # STEP 1: Get coordinates
+        geo_url = (
+            f"https://api.opentripmap.com/0.1/en/places/geoname"
+            f"?name={city}"
+            f"&apikey={api_key}"
+        )
 
-    print("GEO DATA:", geo_data)
-    lat = geo_data["lat"]
-    lon = geo_data["lon"]
+        geo_response = requests.get(geo_url)
+        geo_data = geo_response.json()
 
-    print("PASSED LAT/LON STEP")
+        print("GEO DATA:")
+        print(geo_data)
 
-    places_url = (
-        f"https://api.opentripmap.com/0.1/en/places/radius"
-        f"?radius=10000"
-        f"&lon={lon}"
-        f"&lat={lat}"
-        f"&rate=2"
-        f"&limit=5"
-        f"&apikey={api_key}"
-    )
-    print("PLACES URL:", places_url)
+        if "lat" not in geo_data or "lon" not in geo_data:
+            return (
+                f"Could not find coordinates for {city}.\n"
+                f"Response: {geo_data}"
+            )
 
-    places_response = requests.get(places_url)
+        lat = geo_data["lat"]
+        lon = geo_data["lon"]
 
-    print("PLACES REQUEST SENT")
-    print("STATUS:", places_response.status_code)
+        print("PASSED LAT/LON STEP")
 
-    attractions = []
+        # STEP 2: Get attractions
+        places_url = (
+            f"https://api.opentripmap.com/0.1/en/places/radius"
+            f"?radius=10000"
+            f"&lon={lon}"
+            f"&lat={lat}"
+            f"&rate=2"
+            f"&limit=5"
+            f"&apikey={api_key}"
+        )
 
-    for place in places_data["features"]:
-        name = place["properties"]["name"]
+        print("PLACES URL:")
+        print(places_url)
 
-        if name:
-            attractions.append(name)
+        places_response = requests.get(places_url)
 
-    return "\n".join(attractions)
+        print("PLACES STATUS:")
+        print(places_response.status_code)
+
+        places_data = places_response.json()
+
+        print("PLACES DATA:")
+        print(places_data)
+
+        if "features" not in places_data:
+            return (
+                f"No attractions data received.\n"
+                f"Response: {places_data}"
+            )
+
+        attractions = []
+
+        for place in places_data.get("features", []):
+
+            name = (
+                place.get("properties", {})
+                .get("name", "")
+            )
+
+            if name:
+                attractions.append(name)
+
+        if not attractions:
+            return f"No attractions found for {city}"
+
+        return "\n".join(attractions)
+
+    except Exception as e:
+
+        return f"Attractions Tool Error: {str(e)}"
