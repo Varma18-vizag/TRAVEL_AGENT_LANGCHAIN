@@ -23,6 +23,8 @@ def get_attractions(city: str) -> str:
     geo_response = requests.get(geo_url)
     geo_data = geo_response.json()
 
+    return str(geo_data)
+
     lat = geo_data["lat"]
     lon = geo_data["lon"]
 
