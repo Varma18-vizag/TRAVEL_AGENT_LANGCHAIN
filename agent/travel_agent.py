@@ -38,6 +38,12 @@ Weather Information:
 Hotel Recommendations:
 {hotel_data}
 
+IMPORTANT:
+- Use ONLY the hotels provided above.
+- Do NOT invent hotel names.
+- Do NOT invent hotel addresses.
+- If hotel data is unavailable, mention that clearly.
+
 Tourist Attractions:
 {attractions_data}
 
