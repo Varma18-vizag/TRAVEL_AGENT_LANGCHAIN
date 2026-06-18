@@ -24,39 +24,95 @@ def travel_agent(city: str, days: int):
         }
     )
 
+    print("\n===== TOOL OUTPUTS =====")
+
+    print("\nWEATHER:")
+    print(weather_data)
+
+    print("\nHOTELS:")
+    print(hotel_data)
+
+    print("\nATTRACTIONS:")
+    print(attractions_data)
+
+    print("\nBUDGET:")
+    print(budget_data)
+
+    print("\n========================\n")
+
     prompt = f"""
-You are an expert travel planner.
+You are a professional travel planning assistant.
 
-Create a detailed travel itinerary.
+Your job is to create a travel itinerary ONLY from the information provided below.
 
-City: {city}
-Duration: {days} days
+IMPORTANT RULES:
 
-Weather Information:
+1. Use ONLY the information provided in the tool outputs.
+2. NEVER invent hotels.
+3. NEVER invent hotel addresses.
+4. NEVER invent tourist attractions.
+5. NEVER invent weather information.
+6. NEVER invent prices or budget values.
+7. If any information is unavailable, clearly mention:
+   "Information not available."
+8. Do not mention places outside the destination city.
+9. Do not create fictional locations.
+10. If hotel recommendations are empty, state that hotel information could not be retrieved.
+11. If attraction information is empty, state that attraction information could not be retrieved.
+12. Do not make assumptions.
+13. Use the exact hotel names returned by the hotel tool.
+14. Use the exact attraction names returned by the attractions tool.
+
+Destination City:
+{city}
+
+Trip Duration:
+{days} days
+
+=========================
+WEATHER INFORMATION
+=========================
 {weather_data}
 
-Hotel Recommendations:
+=========================
+HOTEL RECOMMENDATIONS
+=========================
 {hotel_data}
 
-IMPORTANT:
-- Use ONLY the hotels provided above.
-- Do NOT invent hotel names.
-- Do NOT invent hotel addresses.
-- If hotel data is unavailable, mention that clearly.
-
-Tourist Attractions:
+=========================
+TOURIST ATTRACTIONS
+=========================
 {attractions_data}
 
-Budget Information:
+=========================
+BUDGET INFORMATION
+=========================
 {budget_data}
 
-Generate:
+Create the response in the following format:
 
-1. Trip Overview
-2. Recommended Hotel
-3. Day-wise itinerary
-4. Estimated Budget
-5. Travel Tips
+# Trip Overview
+
+Provide a short introduction to the destination using only available information.
+
+# Recommended Hotel
+
+List ONLY hotels from the provided hotel data.
+
+# Day-wise Itinerary
+
+Create a day-wise plan using ONLY the attractions provided.
+
+# Estimated Budget
+
+Summarize the budget information.
+
+# Travel Tips
+
+Provide general travel tips relevant to the destination.
+
+Remember:
+If information is missing, say it is unavailable rather than creating information.
 """
 
     return generate_response(prompt)
@@ -64,7 +120,6 @@ Generate:
 
 def extract_city(query: str):
 
-    # Weather in Goa
     match = re.search(
         r"(?:in|at|for|to)\s+([A-Za-z\s]+)",
         query,
